@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
+from dotenv import load_dotenv
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+dotenv_path = os.path.join(BASE_DIR, ".env")  # Looks for .env inside "C:\django\pos\mypos"
+load_dotenv(dotenv_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -108,11 +110,11 @@ WSGI_APPLICATION = 'mypos.wsgi.application'
 DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mypos',  # Your MySQL database name
-        'USER': 'root',  # Your MySQL username
-        'PASSWORD': '',  # Replace with your actual password
-        'HOST': 'localhost',  # Or '127.0.0.1'
-        'PORT': '3306',  # Default MySQL port
+        'NAME': os.getenv('DB_NAME'),  # Your MySQL database name
+        'USER':os.getenv('DB_USER'),  # Your MySQL username
+        'PASSWORD': os.getenv('DB_PASSWORD'),  # Replace with your actual password
+        'HOST': os.getenv('DB_HOST'),  # Or '127.0.0.1'
+        'PORT': os.getenv('DB_PORT'),  # Default MySQL port
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
