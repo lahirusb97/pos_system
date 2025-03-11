@@ -28,7 +28,9 @@ router.register(r'category', views.CategoryViewSet)  # This will create API rout
 router.register(r'customer', views.CustomerViewSet)  # This will create API routes for Category
 router.register(r'products', views.ProductViewSet)  # This will create API routes for Category
 router.register(r'users', views.UserViewSet)
-
+# router.register(r'orders', views.OrderViewSet)
+# router.register(r'order-items', views.OrderItemViewSet)
+# router.register(r'payments', views.PaymentViewSet)
 
 urlpatterns = [
      path('', include(router.urls)),
@@ -38,8 +40,8 @@ urlpatterns = [
     path("login/", views.login_user, name="login"),
     path("user/", views.get_user_info, name="login"),
     path("logout/", views.logout_user, name="login"),
-    path('orders/', views.CreateOrderView.as_view(), name='create_order'),
-    # path('orders/<int:order_id>/', views.CreateOrderView.as_view(), name='make_payment'),
+   path("orders/create/", views.CreateOrderAPIView.as_view(), name="order-create"),
+   path("orders/", views.OrderListAPIView.as_view(), name="order-list"),
 ]
 
 

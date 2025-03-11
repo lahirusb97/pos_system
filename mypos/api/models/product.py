@@ -8,9 +8,9 @@ class Product(models.Model):
     normal_price = models.PositiveIntegerField()  # Normal price
     max_price = models.PositiveIntegerField()  # Max price
     qty = models.PositiveIntegerField()  # Stock quantity
-    note = models.CharField(max_length=200)  # Auto timestamp
+    note = models.CharField(max_length=200,blank=True)  # Auto timestamp
     created_at = models.DateTimeField(auto_now_add=True)  # Auto timestamp
-  
+    cost = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.name} ({self.barcode})"
+        return f"{self.name} "

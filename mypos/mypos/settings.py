@@ -40,8 +40,9 @@ CORS_ALLOW_METHODS = [
     "GET",
     "POST",
     "PUT",
+    "PATCH",  # ✅ PATCH method is now correctly listed
     "DELETE",
-    "OPTIONS"
+    "OPTIONS",
 ]
 
 CORS_ALLOW_HEADERS = [
