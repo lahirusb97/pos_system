@@ -3,7 +3,7 @@ import re
 from django.utils.translation import gettext_lazy as _
 
 
-class Coustomer(models.Model):
+class Customer(models.Model):
     name = models.CharField(max_length=100)
     mobile = models.CharField(max_length=10, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)

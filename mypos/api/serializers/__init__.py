@@ -1,0 +1,6 @@
+from .category_serializer import CategorySerializer
+from .customer_serializer import CustomerSerializer
+from .product_serializer import ProductSerializer
+from .user_serializer import UserSerializer
+from .order_serializer import OrderSerializer
+from .payment_serializer import PaymentSerializer,OrderPaymentSerializer

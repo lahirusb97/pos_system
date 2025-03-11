@@ -22,11 +22,13 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
 router = routers.DefaultRouter()
 router.register(r'category', views.CategoryViewSet)  # This will create API routes for Category
-router.register(r'customer', views.CoustomerViewSet)  # This will create API routes for Category
+router.register(r'customer', views.CustomerViewSet)  # This will create API routes for Category
 router.register(r'products', views.ProductViewSet)  # This will create API routes for Category
 router.register(r'users', views.UserViewSet)
+
 
 urlpatterns = [
      path('', include(router.urls)),
@@ -36,6 +38,8 @@ urlpatterns = [
     path("login/", views.login_user, name="login"),
     path("user/", views.get_user_info, name="login"),
     path("logout/", views.logout_user, name="login"),
+    path('orders/', views.CreateOrderView.as_view(), name='create_order'),
+    # path('orders/<int:order_id>/', views.CreateOrderView.as_view(), name='make_payment'),
 ]
 
 
