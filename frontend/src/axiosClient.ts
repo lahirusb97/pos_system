@@ -1,27 +1,26 @@
 import axios from "axios";
 
-// Axios instance
+// Axios instance with credentials enabled
 const axiosClient = axios.create({
   baseURL: "http://127.0.0.1:8000/api/",
-  withCredentials: true, // Ensures cookies (refreshToken) are sent
+  withCredentials: true, // Allows browser to send cookies automatically
 });
 
-// Function to get the access token
-const getAccessToken = () => localStorage.getItem("accessToken");
+// Store the access token in memory (not localStorage)
+let accessToken: null | string = null;
 
 // Attach access token to every request
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Handle 401 errors (expired access token)
+// Handle 401 errors and refresh the access token
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -30,22 +29,22 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        // Request new access token
+        // Request new access token (refresh token is sent automatically via cookies)
         const { data } = await axios.post(
           "/auth/refresh",
           {},
           { withCredentials: true }
         );
 
-        // Store new access token
-        localStorage.setItem("accessToken", data.accessToken);
+        // Store the new access token in memory
+        accessToken = data.accessToken;
 
-        // Retry the failed request
+        // Retry the failed request with the new access token
         originalRequest.headers["Authorization"] = `Bearer ${data.accessToken}`;
         return axiosClient(originalRequest);
       } catch (err) {
-        console.error("Refresh token expired:", err);
-        localStorage.removeItem("accessToken");
+        console.error("Refresh token expired or invalid:", err);
+        accessToken = null;
         window.location.href = "/login"; // Redirect to login
       }
     }

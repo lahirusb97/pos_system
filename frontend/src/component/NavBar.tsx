@@ -17,8 +17,8 @@ import { useNavigate } from "react-router";
 const pages = [
   { name: "Invoice", path: "/" },
   { name: "Dashboard", path: "/Dashboard" },
-  { name: "Product", path: "/stock" }, // Optional if you want sub-routes
-  { name: "Product Create", path: "/stock/create" }, // Optional if you want sub-routes
+  { name: "Product", path: "/product" }, // Optional if you want sub-routes
+  { name: "Product Create", path: "/product/create" }, // Optional if you want sub-routes
   { name: "Category Create", path: "/category/create" }, // Optional if you want sub-routes
 ];
 

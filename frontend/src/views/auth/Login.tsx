@@ -12,8 +12,8 @@ import axiosClient from "../../axiosClient";
 import { useAuthContext } from "../../context/AuthContext";
 
 const Login = () => {
-  const [username, setUsername] = useState<string>("testuser");
-  const [password, setPassword] = useState<string>("mypassword");
+  const [username, setUsername] = useState<string>("admin");
+  const [password, setPassword] = useState<string>("admin");
   const navigate = useNavigate();
   const { setAuth } = useAuthContext();
 
@@ -26,7 +26,6 @@ const Login = () => {
         password,
       });
       setAuth(response.data);
-      console.log(response.data);
 
       navigate("/");
     } catch (error) {

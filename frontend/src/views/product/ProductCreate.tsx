@@ -1,191 +1,147 @@
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   TextField,
   Button,
-  Container,
-  MenuItem,
-  Select,
-  InputLabel,
   FormControl,
   Typography,
-  Box,
+  Paper,
 } from "@mui/material";
 import axiosClient from "../../axiosClient"; // Import your Axios instance
-import { useState, useEffect } from "react";
 import useGetCategory from "../../hooks/useGetCategory";
 import DropdownInput from "../../component/DropdownInput";
-interface ProductFormData {
-  category: string;
-  name: string;
-  normal_price: number;
-  max_price: number;
-  qty: number;
-  note: string;
-}
-
-const schema = yup.object().shape({
-  category: yup.string().required("Category is required"),
-  name: yup.string().required("Product name is required"),
-  normal_price: yup
-    .number()
-    .positive()
-    .integer()
-    .required("Normal price is required"),
-  max_price: yup
-    .number()
-    .positive()
-    .integer()
-    .required("Max price is required"),
-  qty: yup.number().positive().integer().required("Quantity is required"),
-  note: yup.string().optional(),
-});
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import schemaProduct, { ProductFormZod } from "../../schema/schemaProduct";
+import { extractErrorMessage } from "../../util/extractErrorMessage";
+import { useAddProductMutation } from "../../apislice/productApiSlice";
 
 const ProductCreate = () => {
-  const { category, categoryLoading, categoryError } = useGetCategory();
+  const { category, categoryLoading } = useGetCategory();
+  const [addProduct, { isLoading, isError, isSuccess }] =
+    useAddProductMutation();
+
   const {
     handleSubmit,
     control,
+    register,
     reset,
+    watch,
     formState: { errors },
-  } = useForm<ProductFormData>({
-    resolver: yupResolver(schema),
+  } = useForm<ProductFormZod>({
+    resolver: zodResolver(schemaProduct),
     defaultValues: {
-      category: "",
       name: "",
-      normal_price: 0,
-      max_price: 0,
-      qty: 1,
+      normal_price: undefined,
+      max_price: undefined,
+      cost: undefined,
+      qty: undefined,
       note: "",
+      category: undefined,
     },
   });
-  console.log(category);
 
-  const onSubmit = async (data: ProductFormData) => {
+  const onSubmit = async (data: ProductFormZod) => {
     try {
-      await axiosClient.post("/products/", data);
-      reset(); // Reset form after successful submission
+      await addProduct(data).unwrap();
+      // await axiosClient.post("/products/", data);
+      reset();
+      toast.success("Product added successfully");
     } catch (error) {
-      console.error("Error adding product", error);
+      toast.error(extractErrorMessage(error));
+      console.log(error);
     }
   };
 
   return (
-    <Container maxWidth="sm">
+    <Paper
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        maxWidth: "600px",
+        mx: "auto",
+        p: 1,
+        mt: 2,
+      }}
+    >
       <Typography variant="h4" align="center" gutterBottom>
         Add Product
       </Typography>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-      >
-        {/* Category Select Field */}
-        <FormControl fullWidth>
-          <InputLabel>Category</InputLabel>
-          <Controller
-            name="category"
-            control={control}
-            render={({ field }) => (
-              <DropdownInput
-                {...field}
-                options={category.results || []}
-                onChange={(selectedId) => field.onChange(selectedId)}
-                loading={categoryLoading}
-                labelName="Select Category"
-                defaultId={null}
-              />
-            )}
-          />
-        </FormControl>
 
-        {/* Name Field */}
+      <FormControl fullWidth>
         <Controller
-          name="name"
+          name="category"
           control={control}
           render={({ field }) => (
-            <TextField
+            <DropdownInput
               {...field}
-              label="Product Name"
-              fullWidth
-              error={!!errors.name}
+              options={category || []}
+              onChange={(selectedId) => field.onChange(selectedId)}
+              loading={categoryLoading}
+              labelName="Select Category"
+              defaultId={watch("category")}
+              error={!!errors.category}
+              helperText={errors.category?.message || ""}
             />
           )}
         />
-        {errors.name && (
-          <Typography color="error">{errors.name.message}</Typography>
-        )}
+      </FormControl>
+      <TextField
+        {...register("name")}
+        label="Product Name"
+        type="text"
+        fullWidth
+        error={!!errors.name}
+        helperText={errors.name?.message || ""}
+      />
+      <TextField
+        {...register("normal_price", { valueAsNumber: true })}
+        label="Normal Price"
+        type="number"
+        fullWidth
+        error={!!errors.normal_price}
+        helperText={errors.normal_price?.message || ""}
+      />
 
-        {/* Normal Price Field */}
-        <Controller
-          name="normal_price"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Normal Price"
-              type="number"
-              fullWidth
-              error={!!errors.normal_price}
-            />
-          )}
-        />
-        {errors.normal_price && (
-          <Typography color="error">{errors.normal_price.message}</Typography>
-        )}
-
-        {/* Max Price Field */}
-        <Controller
-          name="max_price"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Max Price"
-              type="number"
-              fullWidth
-              error={!!errors.max_price}
-            />
-          )}
-        />
-        {errors.max_price && (
-          <Typography color="error">{errors.max_price.message}</Typography>
-        )}
-
-        {/* Quantity Field */}
-        <Controller
-          name="qty"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Quantity"
-              type="number"
-              fullWidth
-              error={!!errors.qty}
-            />
-          )}
-        />
-        {errors.qty && (
-          <Typography color="error">{errors.qty.message}</Typography>
-        )}
-
-        {/* Note Field */}
-        <Controller
-          name="note"
-          control={control}
-          render={({ field }) => (
-            <TextField {...field} label="Note (Optional)" fullWidth />
-          )}
-        />
-
-        {/* Submit Button */}
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Add Product
-        </Button>
-      </Box>
-    </Container>
+      <TextField
+        {...register("max_price", { valueAsNumber: true })}
+        label="Normal Price"
+        type="number"
+        fullWidth
+        error={!!errors.max_price}
+        helperText={errors.max_price?.message || ""}
+      />
+      <TextField
+        {...register("cost", { valueAsNumber: true })}
+        label="Normal Price"
+        type="number"
+        fullWidth
+        error={!!errors.cost}
+        helperText={errors.cost?.message || ""}
+      />
+      <TextField
+        {...register("qty", { valueAsNumber: true })}
+        label="Normal Price"
+        type="number"
+        fullWidth
+        error={!!errors.qty}
+        helperText={errors.qty?.message || ""}
+      />
+      <TextField
+        {...register("note")}
+        label="note "
+        type="text"
+        fullWidth
+        error={!!errors.note}
+        helperText={errors.note?.message || ""}
+      />
+      <Button type="submit" variant="contained" color="primary" fullWidth>
+        Add Product
+      </Button>
+    </Paper>
   );
 };
 

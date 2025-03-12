@@ -13,7 +13,9 @@ interface AutocompleteInputFieldProps {
   onChange: (selectedId: number | null) => void;
   loading: boolean;
   labelName: string;
-  defaultId?: number | null;
+  defaultId?: number | null | undefined;
+  error?: boolean; // ✅ New: Error flag for validation
+  helperText?: string; // ✅ New: Helper text for validation message
 }
 
 const AutocompleteInputField: React.FC<AutocompleteInputFieldProps> = ({
@@ -22,6 +24,8 @@ const AutocompleteInputField: React.FC<AutocompleteInputFieldProps> = ({
   loading,
   labelName,
   defaultId,
+  error,
+  helperText,
 }) => {
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
@@ -55,6 +59,8 @@ const AutocompleteInputField: React.FC<AutocompleteInputFieldProps> = ({
       isOptionEqualToValue={(option, value) => option.id === value?.id} // Compare by id
       renderInput={(params) => (
         <TextField
+          error={error} // ✅ Show error
+          helperText={helperText} // ✅ Show error message
           {...params}
           label={labelName}
           InputProps={{

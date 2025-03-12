@@ -5,7 +5,9 @@ import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import axiosClient from "../../axiosClient"; // Import your Axios instance
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
-import CategoryIndex from "./CategoryIndex";
+import useGetSingleCategory from "../../hooks/useGetSingleCategory";
+import { useNavigate, useParams } from "react-router";
+import { useEffect } from "react";
 
 interface CategoryFormData {
   name: string;
@@ -15,7 +17,11 @@ const schema = yup.object().shape({
   name: yup.string().required("Category name is required"),
 });
 
-const CategoryForm = () => {
+const CategoryUpdate = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { singleCategory, singleCategoryLoading } = useGetSingleCategory(id);
+
   const {
     handleSubmit,
     control,
@@ -27,15 +33,26 @@ const CategoryForm = () => {
       name: "",
     },
   });
-
+  useEffect(() => {
+    if (!singleCategoryLoading) {
+      reset({
+        name: singleCategory?.name || "",
+      });
+    }
+  }, [singleCategory]);
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await axiosClient.post("/category/", data);
-      toast.success("Category added successfully");
+      await axiosClient.patch(`/category/${id}/`, data);
       reset(); // Reset form after successful submission
+      navigate(-1);
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.name[0] || "Failed to add category");
+        if (error.status === 400)
+          toast.error(
+            error.response?.data?.name[0] || "Failed to add category"
+          );
+      } else {
+        toast.error("Check your Internet Conection or try other Name ");
       }
     }
   };
@@ -43,7 +60,7 @@ const CategoryForm = () => {
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" align="center" gutterBottom>
-        Add Category
+        Update Category
       </Typography>
       <Box
         component="form"
@@ -69,12 +86,11 @@ const CategoryForm = () => {
 
         {/* Submit Button */}
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Add Category
+          Update Category
         </Button>
       </Box>
-      <CategoryIndex />
     </Container>
   );
 };
 
-export default CategoryForm;
+export default CategoryUpdate;

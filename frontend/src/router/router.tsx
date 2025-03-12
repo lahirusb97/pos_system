@@ -9,6 +9,8 @@ import Product from "../views/product/Product";
 import ProductCreate from "../views/product/ProductCreate";
 import Category from "../views/category/Category";
 import CategoryCreate from "../views/category/CategoryCreate";
+import CategoryUpdate from "../views/category/CategoryUpdate";
+import ProductUpdate from "../views/product/ProductUpdate";
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +24,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "stock",
+    path: "product",
     element: <LoginProtectedRoute />,
     children: [
       {
@@ -35,7 +37,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "update/:id",
-        element: <Product />,
+        element: <ProductUpdate />,
       },
     ],
   },
@@ -53,7 +55,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "update/:id",
-        element: <Product />,
+        element: <CategoryUpdate />,
       },
     ],
   },

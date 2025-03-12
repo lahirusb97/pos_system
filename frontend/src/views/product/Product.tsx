@@ -1,76 +1,157 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+// UI Component: ProductDetails.tsx
+import React, { ChangeEvent, useCallback, useState } from "react";
 import {
+  Box,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
+  TextField,
+  Button,
+  Pagination,
+  Skeleton,
   IconButton,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { Edit, Delete } from "@mui/icons-material";
-import axiosClient from "../../axiosClient";
-
-import useGetProduct from "../../hooks/useGetProduct";
-
-const Product = () => {
-  const { product, productLoading, productError, refresh } = useGetProduct();
+import { useNavigate } from "react-router";
+import { ProductModel } from "../../models/ProductModel";
+import { useDeleteDialog } from "../../context/DeleteDialogContext";
+import { useGetProductQuery } from "../../apislice/productApiSlice";
+import { debounce } from "lodash";
+import ProductCreate from "./ProductCreate";
+export default function ProductDetails() {
+  const theme = useTheme();
   const navigate = useNavigate();
+  const { openDialog } = useDeleteDialog();
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const {
+    data: products,
+    isLoading,
+    refetch,
+  } = useGetProductQuery({ page, limit: 10, search: debouncedSearch });
 
-  const handleDelete = async (id: number) => {
-    try {
-      await axiosClient.delete(`/products/${id}/`);
-      refresh();
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
+  const handleEdit = (id: number) => {
+    navigate(`/product/update/${id}`);
   };
-
-  return (
-    <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Category</TableCell>
-            <TableCell>Normal Price</TableCell>
-            <TableCell>Max Price</TableCell>
-            <TableCell>Qty</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {product.map((product) => (
-            <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell>{product.normal_price}</TableCell>
-              <TableCell>{product.max_price}</TableCell>
-              <TableCell>{product.qty}</TableCell>
-              <TableCell>
-                <IconButton
-                  color="primary"
-                  onClick={() => navigate(`/update/${product.id}`)}
-                >
-                  <Edit />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => handleDelete(product.id)}
-                >
-                  <Delete />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+  const handleSearchDebounce = useCallback(
+    debounce((query: string) => {
+      setDebouncedSearch(query);
+    }, 500), // 500ms delay
+    []
   );
-};
 
-export default Product;
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    handleSearchDebounce(e.target.value);
+  };
+  if (isLoading) {
+    return <>loading....</>;
+  }
+  return (
+    <Box sx={{ padding: 2 }}>
+      {/* Search Bar */}
+
+      <TextField
+        size="small"
+        label="Search"
+        variant="outlined"
+        placeholder="Product Name"
+        fullWidth
+        margin="normal"
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
+
+      {/* Table Container */}
+      <TableContainer
+        component={Paper}
+        sx={{ boxShadow: 3, borderRadius: 2, overflowX: "auto" }}
+      >
+        <Table
+          size="small"
+          sx={{ minWidth: 650 }}
+          aria-label="Product Details Table"
+        >
+          <TableHead>
+            <TableRow sx={{ backgroundColor: theme.palette.grey[200] }}>
+              <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Category</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Normal Price</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Max Price</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Stock Qty</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Cost</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {isLoading ? (
+              [...Array(10)].map((_, index) => (
+                <TableRow key={index}>
+                  {[...Array(7)].map((_, i) => (
+                    <TableCell key={i}>
+                      <Skeleton variant="text" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : products ? (
+              products.results.map((row: ProductModel) => (
+                <TableRow key={row.id}>
+                  <TableCell>
+                    <IconButton
+                      color="warning"
+                      onClick={() => handleEdit(row.id)}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => openDialog(`/products/${row.id}/`)}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.category.name}</TableCell>
+                  <TableCell>{row.normal_price}</TableCell>
+                  <TableCell>{row.max_price}</TableCell>
+                  <TableCell>{row.qty}</TableCell>
+                  <TableCell>{row.cost}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  No products found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Pagination
+          count={Math.ceil((products?.count || 10) / 10)}
+          onChange={(e: ChangeEvent<unknown>, value: number) => {
+            setPage(value);
+            refetch();
+          }}
+        />
+      </Box>
+    </Box>
+  );
+}
