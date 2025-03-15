@@ -15,5 +15,7 @@ class Order(models.Model):
     discount=models.PositiveIntegerField()
     balance = models.PositiveIntegerField(default=0)  # ✅ Add default
     cost=models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+   
     def __str__(self):
         return self.name

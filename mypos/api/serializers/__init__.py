@@ -6,4 +6,4 @@ from .order_serializer import OrderSerializer
 from .orderItem_serializer import OrderItemSerializer
 from .payment_serializer import PaymentSerializer
 from .order_create_serializer import OrderCreateSerializer
-from .order_serializer import OrderSerializer
+from .RepairSerializer import RepairSerializer

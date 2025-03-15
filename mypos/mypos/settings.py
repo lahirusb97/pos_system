@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,12 +29,13 @@ ALLOWED_HOSTS = [
      "http://localhost:5174", 
      '127.0.0.1'
 ]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite frontend
-    "http://127.0.0.1:5173"
-]
 
-CORS_ALLOW_CREDENTIALS = True  # ✅ Allow cookies for authentication
+CORS_ALLOW_CREDENTIALS = True 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  
+    "http://127.0.0.1:8000",
+    "http://localhost:5174",  # Add this if needed
+]
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -49,6 +50,7 @@ CORS_ALLOW_HEADERS = [
     "Authorization",
     "Content-Type",
     "X-CSRFToken",
+    "Cookie",
 ]
 
 INSTALLED_APPS = [
@@ -59,7 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt',
+    "rest_framework.authtoken",
     'api',
     'corsheaders',
 ]
@@ -78,8 +80,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        "rest_framework.authentication.TokenAuthentication",
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 ROOT_URLCONF = 'mypos.urls'

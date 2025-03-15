@@ -10,6 +10,7 @@ class OrderListAPIView(ListAPIView):
 
     # ✅ Enable filtering and searching
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    
-    # ✅ Filtering fields
-    filterset_fields = ["status", "customer__mobile","id"]
+    search_fields = ['id']  # Enables search by 'name'
+
+    # # ✅ Filtering fields
+    # filterset_fields = ["status", "customer__mobile","id"]

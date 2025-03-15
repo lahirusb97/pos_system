@@ -18,30 +18,26 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 from . import views
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+
 
 router = routers.DefaultRouter()
 router.register(r'category', views.CategoryViewSet)  # This will create API routes for Category
 router.register(r'customer', views.CustomerViewSet)  # This will create API routes for Category
 router.register(r'products', views.ProductViewSet)  # This will create API routes for Category
-router.register(r'users', views.UserViewSet)
+# router.register(r'users', views.UserViewSet)
 # router.register(r'orders', views.OrderViewSet)
 # router.register(r'order-items', views.OrderItemViewSet)
 # router.register(r'payments', views.PaymentViewSet)
 
 urlpatterns = [
      path('', include(router.urls)),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("register/", views.register_user, name="register"),
-    path("login/", views.login_user, name="login"),
-    path("user/", views.get_user_info, name="login"),
-    path("logout/", views.logout_user, name="login"),
+    path("login/", views.LoginView.as_view(), name="login"),
    path("orders/create/", views.CreateOrderAPIView.as_view(), name="order-create"),
    path("orders/", views.OrderListAPIView.as_view(), name="order-list"),
+   path("orders/<int:id>/", views.OrderRetrieveAPIView.as_view(), name="order-detail"),  # New path for single order
+   path("payments/", views.PaymentListCreateAPIView.as_view(), name="payment-list"),
+   path("repairs/", views.RepairCreateAPIView.as_view(), name="repair-create"),
 ]
 
 
