@@ -10,7 +10,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Button,
   Pagination,
   Skeleton,
   IconButton,
@@ -20,10 +19,15 @@ import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router";
 import { ProductModel } from "../../models/ProductModel";
 import { useDeleteDialog } from "../../context/DeleteDialogContext";
-import { useGetProductQuery } from "../../apislice/productApiSlice";
+import {
+  useDeleteProductMutation,
+  useGetProductQuery,
+} from "../../apislice/productApiSlice";
 import { debounce } from "lodash";
-import ProductCreate from "./ProductCreate";
+import { useAuthContext } from "../../context/AuthContext";
 export default function ProductDetails() {
+  const { user } = useAuthContext();
+  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
   const theme = useTheme();
   const navigate = useNavigate();
   const { openDialog } = useDeleteDialog();
@@ -86,7 +90,9 @@ export default function ProductDetails() {
               <TableCell sx={{ fontWeight: "bold" }}>Normal Price</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Max Price</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Stock Qty</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Cost</TableCell>
+              {user.is_superuser && (
+                <TableCell sx={{ fontWeight: "bold" }}>Cost</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -112,7 +118,11 @@ export default function ProductDetails() {
                     </IconButton>
                     <IconButton
                       color="error"
-                      onClick={() => openDialog(`/products/${row.id}/`)}
+                      onClick={() =>
+                        openDialog(`/products/${row.id}/`, () =>
+                          deleteProduct(row.id).unwrap()
+                        )
+                      }
                     >
                       <Delete fontSize="small" />
                     </IconButton>
@@ -122,7 +132,7 @@ export default function ProductDetails() {
                   <TableCell>{row.normal_price}</TableCell>
                   <TableCell>{row.max_price}</TableCell>
                   <TableCell>{row.qty}</TableCell>
-                  <TableCell>{row.cost}</TableCell>
+                  {user.is_superuser && <TableCell>{row.cost}</TableCell>}
                 </TableRow>
               ))
             ) : (

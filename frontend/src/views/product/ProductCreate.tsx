@@ -8,16 +8,22 @@ import {
   Paper,
 } from "@mui/material";
 import axiosClient from "../../axiosClient"; // Import your Axios instance
-import useGetCategory from "../../hooks/useGetCategory";
+
 import DropdownInput from "../../component/DropdownInput";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import schemaProduct, { ProductFormZod } from "../../schema/schemaProduct";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
 import { useAddProductMutation } from "../../apislice/productApiSlice";
+import { useGetCategoryQuery } from "../../apislice/categoryApiSlice";
 
 const ProductCreate = () => {
-  const { category, categoryLoading } = useGetCategory();
+  // const { category, categoryLoading } = useGetCategory();
+  const {
+    data: category,
+    error,
+    isLoading: categoryLoading,
+  } = useGetCategoryQuery({ page: 1, limit: 1, search: "" });
   const [addProduct, { isLoading, isError, isSuccess }] =
     useAddProductMutation();
 
@@ -48,7 +54,7 @@ const ProductCreate = () => {
       reset();
       toast.success("Product added successfully");
     } catch (error) {
-      toast.error(extractErrorMessage(error));
+      extractErrorMessage(error);
       console.log(error);
     }
   };
@@ -78,7 +84,7 @@ const ProductCreate = () => {
           render={({ field }) => (
             <DropdownInput
               {...field}
-              options={category || []}
+              options={category?.results || []}
               onChange={(selectedId) => field.onChange(selectedId)}
               loading={categoryLoading}
               labelName="Select Category"
@@ -108,7 +114,7 @@ const ProductCreate = () => {
 
       <TextField
         {...register("max_price", { valueAsNumber: true })}
-        label="Normal Price"
+        label="Max Price"
         type="number"
         fullWidth
         error={!!errors.max_price}
@@ -116,7 +122,7 @@ const ProductCreate = () => {
       />
       <TextField
         {...register("cost", { valueAsNumber: true })}
-        label="Normal Price"
+        label="Cost"
         type="number"
         fullWidth
         error={!!errors.cost}
@@ -124,7 +130,7 @@ const ProductCreate = () => {
       />
       <TextField
         {...register("qty", { valueAsNumber: true })}
-        label="Normal Price"
+        label="Quantity"
         type="number"
         fullWidth
         error={!!errors.qty}

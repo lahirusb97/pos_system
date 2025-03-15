@@ -8,17 +8,21 @@ import { DeleteDialogProvider } from "./context/DeleteDialogContext.tsx";
 import DeleteDialog from "./component/DeleteDialog.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+import { ThemeProvider } from "@mui/material";
+import theme from "./theme/theme.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <DeleteDialogProvider>
-      <AuthProvider>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </AuthProvider>
-      <DeleteDialog />
-    </DeleteDialogProvider>
-    <Toaster position="bottom-center" gutter={8} />
+    <ThemeProvider theme={theme}>
+      <DeleteDialogProvider>
+        <AuthProvider>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </AuthProvider>
+        <DeleteDialog />
+      </DeleteDialogProvider>
+      <Toaster position="bottom-center" gutter={8} />
+    </ThemeProvider>
   </StrictMode>
 );

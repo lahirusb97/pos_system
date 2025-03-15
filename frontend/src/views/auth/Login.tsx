@@ -8,27 +8,27 @@ import {
   Box,
   Paper,
 } from "@mui/material";
-import axiosClient from "../../axiosClient";
 import { useAuthContext } from "../../context/AuthContext";
+import { useLoginUserMutation } from "../../apislice/authApiSlice";
+import { extractErrorMessage } from "../../util/extractErrorMessage";
 
 const Login = () => {
-  const [username, setUsername] = useState<string>("admin");
-  const [password, setPassword] = useState<string>("admin");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
   const { setAuth } = useAuthContext();
+  const [loginUser, { isLoading }] = useLoginUserMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await axiosClient.post("login/", {
-        username,
-        password,
-      });
-      setAuth(response.data);
+      const response = await loginUser({ username, password }).unwrap();
 
+      setAuth(response);
       navigate("/");
     } catch (error) {
+      extractErrorMessage(error);
       console.log(error);
     }
   };
@@ -81,8 +81,9 @@ const Login = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 2 }}
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
         </Box>
       </Paper>

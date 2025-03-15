@@ -1,32 +1,30 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { baseQueryWithReauth } from "../baseAuthRtk";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQuery } from "../baseAuthRtk";
 // import { OrderModel } from "../models/OrderModel";
 import { PaginatedResponse } from "../models/PaginatedResponse";
 import { OrderModel } from "../models/OrderModel";
-import { invoiceFormZod } from "../schema/schemaInvoice";
 import { InvoiceWithProducts } from "../models/ProductForm";
 // import { OrderForm } from "../models/OrderForm";
 // import { OrderFormZod } from "../schema/schemaOrder";
-
 export const orderApiSlice = createApi({
   reducerPath: "order",
-  baseQuery: baseQueryWithReauth,
+  baseQuery: baseQuery,
   tagTypes: ["Order"],
   endpoints: (builder) => {
     return {
-      // getOrder: builder.query<
-      //   PaginatedResponse<OrderModel>,
-      //   { page: number; limit: number; search?: string }
-      // >({
-      //   query: ({ page, limit, search }) => {
-      //     let URL = `orders/?page=${page}&limit=${limit}`;
-      //     if (search) {
-      //       URL += `&search=${encodeURIComponent(search)}`;
-      //     }
-      //     return URL;
-      //   },
-      //   providesTags: [{ type: "Order", id: "LIST" }],
-      // }),
+      getOrder: builder.query<
+        PaginatedResponse<OrderModel>,
+        { page: number; limit: number; search?: string }
+      >({
+        query: ({ page, limit, search }) => {
+          let URL = `orders/?page=${page}&limit=${limit}`;
+          if (search) {
+            URL += `&search=${encodeURIComponent(search)}`;
+          }
+          return URL;
+        },
+        providesTags: [{ type: "Order", id: "LIST" }],
+      }),
 
       addOrder: builder.mutation<OrderModel, InvoiceWithProducts>({
         query: (newOrder) => ({
@@ -46,8 +44,35 @@ export const orderApiSlice = createApi({
       //   }),
       //   // invalidatesTags: [{ type: "Order", id: "LIST" }], // Ensures the order list updates after editing
       // }),
+      getSingleOrder: builder.query<OrderModel, number>({
+        query: (id) => `orders/${id}/`, // `id` is used to fetch the single order by ID
+        providesTags: (result, error, id) => [{ type: "Order", id: id }],
+      }),
+      deleteOrder: builder.mutation<void, number>({
+        query: (id) => ({
+          url: `orders/${id}/`,
+          method: "DELETE",
+        }),
+        invalidatesTags: [{ type: "Order", id: "LIST" }], // Refresh order list after deletion
+      }),
+      updatePayment: builder.mutation({
+        query: (payment) => ({
+          url: `payments/`, // Assuming your API expects the product ID in the URL
+          method: "POST", // Use "PATCH" if you're only updating some fields
+          body: payment,
+        }),
+        invalidatesTags: (result, error, payment) => [
+          { type: "Order", id: payment.order },
+        ],
+      }),
     };
   },
 });
 // export const { useGetOrderQuery, useAddOrderMutation, useUpdateOrderMutation } =
-export const { useAddOrderMutation } = orderApiSlice;
+export const {
+  useGetOrderQuery,
+  useAddOrderMutation,
+  useGetSingleOrderQuery,
+  useDeleteOrderMutation,
+  useUpdatePaymentMutation,
+} = orderApiSlice;

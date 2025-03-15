@@ -12,15 +12,15 @@ import {
   FormControl,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
-import useGetSingleProduct from "../../hooks/useGetSingleProduct";
-import axiosClient from "../../axiosClient";
 import DropdownInput from "../../component/DropdownInput";
-import useGetCategory from "../../hooks/useGetCategory";
 import toast from "react-hot-toast";
 import { ProductForm } from "../../models/ProductForm";
-import { AxiosError } from "axios";
-import { useUpdateProductMutation } from "../../apislice/productApiSlice";
-import ProductDetails from "./Product";
+import {
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
+} from "../../apislice/productApiSlice";
+import { useGetCategoryQuery } from "../../apislice/categoryApiSlice";
+import { extractErrorMessage } from "../../util/extractErrorMessage";
 
 // Validation Schema
 const productSchema = yup.object().shape({
@@ -53,11 +53,19 @@ const productSchema = yup.object().shape({
 export default function ProductUpdate() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { singleProduct, singleProductLoading } = useGetSingleProduct(id);
+  const { data: singleProduct, isLoading: singleProductLoading } =
+    useGetProductByIdQuery(id, {
+      skip: isNaN(id), // ✅ Skip query if ID is not a number
+    });
 
-  const [updateProduct, { isLoading }] = useUpdateProductMutation();
+  const [updateProduct, { isLoading: updateLoading }] =
+    useUpdateProductMutation();
 
-  const { category, categoryLoading } = useGetCategory();
+  const { data: category, isLoading: categoryLoading } = useGetCategoryQuery({
+    page: 1,
+    limit: 1,
+    search: "",
+  });
   const {
     register,
     handleSubmit,
@@ -86,15 +94,11 @@ export default function ProductUpdate() {
     try {
       await updateProduct({ id, data }).unwrap();
       toast.success("Product updated successfully");
-      // navigate(-1);
       reset();
+      navigate(-1);
       toast.success("Product updated successfully");
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.name[0] || "Failed to update product"
-        );
-      }
+      extractErrorMessage(error);
     }
   };
 
@@ -166,7 +170,7 @@ export default function ProductUpdate() {
               render={({ field }) => (
                 <DropdownInput
                   {...field}
-                  options={category || []}
+                  options={category?.results || []}
                   onChange={(selectedId) => field.onChange(selectedId)}
                   loading={categoryLoading}
                   labelName="Select Category"

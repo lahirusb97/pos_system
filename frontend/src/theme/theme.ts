@@ -15,9 +15,13 @@ const theme = createTheme({
       },
     },
   },
-  typography: {
-    button: {
-      textTransform: "capitalize",
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none", // ✅ Ensure no uppercase globally for all buttons
+        },
+      },
     },
   },
 });

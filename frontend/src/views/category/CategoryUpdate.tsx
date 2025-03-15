@@ -2,12 +2,14 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import axiosClient from "../../axiosClient"; // Import your Axios instance
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
-import useGetSingleCategory from "../../hooks/useGetSingleCategory";
 import { useNavigate, useParams } from "react-router";
 import { useEffect } from "react";
+import {
+  useGetCategoryByIdQuery,
+  useUpdateCategoryMutation,
+} from "../../apislice/categoryApiSlice";
 
 interface CategoryFormData {
   name: string;
@@ -20,8 +22,12 @@ const schema = yup.object().shape({
 const CategoryUpdate = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { singleCategory, singleCategoryLoading } = useGetSingleCategory(id);
 
+  const { data: singleCategory, isLoading: singleCategoryLoading } =
+    useGetCategoryByIdQuery(id, {
+      skip: isNaN(id), // ✅ Skip query if ID is not valid
+    });
+  const [updateCategory] = useUpdateCategoryMutation();
   const {
     handleSubmit,
     control,
@@ -42,7 +48,7 @@ const CategoryUpdate = () => {
   }, [singleCategory]);
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await axiosClient.patch(`/category/${id}/`, data);
+      await updateCategory({ id, data }).unwrap();
       reset(); // Reset form after successful submission
       navigate(-1);
     } catch (error) {

@@ -2,10 +2,11 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import axiosClient from "../../axiosClient"; // Import your Axios instance
 import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import CategoryIndex from "./CategoryIndex";
+import { useAddCategoryMutation } from "../../apislice/categoryApiSlice";
+import { extractErrorMessage } from "../../util/extractErrorMessage";
 
 interface CategoryFormData {
   name: string;
@@ -16,6 +17,9 @@ const schema = yup.object().shape({
 });
 
 const CategoryForm = () => {
+  const [AddCategory, { isLoading, isError, isSuccess }] =
+    useAddCategoryMutation();
+
   const {
     handleSubmit,
     control,
@@ -30,13 +34,12 @@ const CategoryForm = () => {
 
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await axiosClient.post("/category/", data);
+      await AddCategory(data).unwrap();
+
       toast.success("Category added successfully");
       reset(); // Reset form after successful submission
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.name[0] || "Failed to add category");
-      }
+      extractErrorMessage(error);
     }
   };
 

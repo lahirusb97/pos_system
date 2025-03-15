@@ -1,15 +1,15 @@
+// DeleteDialogContext.tsx
 import React, { createContext, useContext, useState } from "react";
 
 interface DeleteDialogState {
   open: boolean;
-  path: string;
   itemName?: string;
-  refresh?: () => void;
+  deleteFunction?: () => Promise<void>; // Accepts a function
 }
 
 interface DeleteDialogContextType {
   state: DeleteDialogState;
-  openDialog: (path: string, itemName?: string, refresh?: () => void) => void;
+  openDialog: (itemName: string, deleteFunction: () => Promise<void>) => void;
   closeDialog: () => void;
 }
 
@@ -20,28 +20,17 @@ const DeleteDialogContext = createContext<DeleteDialogContextType | undefined>(
 export const DeleteDialogProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [state, setState] = useState<DeleteDialogState>({
-    open: false,
-    path: "",
-    itemName: undefined,
-    refresh: undefined,
-  });
+  const [state, setState] = useState<DeleteDialogState>({ open: false });
 
   const openDialog = (
-    path: string,
-    itemName?: string,
-    refresh?: () => void
+    itemName: string,
+    deleteFunction: () => Promise<void>
   ) => {
-    setState({ open: true, path, itemName, refresh });
+    setState({ open: true, itemName, deleteFunction });
   };
 
   const closeDialog = () => {
-    setState({
-      open: false,
-      path: "",
-      itemName: undefined,
-      refresh: undefined,
-    });
+    setState({ open: false });
   };
 
   return (

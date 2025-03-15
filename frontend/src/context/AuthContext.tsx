@@ -8,7 +8,6 @@ import {
   useEffect,
   useMemo,
 } from "react";
-import axiosClient from "../axiosClient";
 
 type LoginResponse = {
   user: string;
@@ -40,17 +39,9 @@ export const AuthProvider = ({ children }: AuthContextProps) => {
     }
   });
 
-  // Store user data in localStorage when it changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("mypos_auth", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("mypos_auth");
-    }
-  }, [user]);
-
   const setAuth = (userData: LoginResponse | null) => {
     setUser(userData);
+    localStorage.setItem("mypos_auth", JSON.stringify(userData));
   };
 
   const clearUser = () => {

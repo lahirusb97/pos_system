@@ -7,26 +7,20 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import axiosClient from "../axiosClient";
 import { useDeleteDialog } from "../context/DeleteDialogContext";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
+import { extractErrorMessage } from "../util/extractErrorMessage";
 
 const DeleteDialog: React.FC = () => {
   const { state, closeDialog } = useDeleteDialog();
 
   const handleDelete = async () => {
     try {
-      await axiosClient.delete(state.path);
-      toast.success("Item deleted successfully");
-      if (state.refresh) state.refresh(); // Call refresh function if provided
+      await state.deleteFunction?.();
+      toast.success(`${state.itemName} deleted successfully`);
       closeDialog();
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.error || "Delete operation failed");
-      }
-
-      toast.error("Delete operation failed");
+      extractErrorMessage(error);
     }
   };
 

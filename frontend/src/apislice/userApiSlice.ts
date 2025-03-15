@@ -4,7 +4,7 @@ import { ProductModel } from "../models/ProductModel";
 import { PaginatedResponse } from "../models/PaginatedResponse";
 import { ProductFormZod } from "../schema/schemaProduct";
 
-export const productApiSlice = createApi({
+export const userApiSlice = createApi({
   reducerPath: "product",
   baseQuery: baseQuery,
   tagTypes: ["Product"],
@@ -30,9 +30,6 @@ export const productApiSlice = createApi({
           method: "POST",
           body: newProduct,
         }),
-        //!CATEFULL WITH API WHEN DO THIS
-        invalidatesTags: (result) =>
-          result ? [{ type: "Product", id: result.id }] : [],
       }),
       updateProduct: builder.mutation<
         ProductModel,
@@ -43,26 +40,13 @@ export const productApiSlice = createApi({
           method: "PUT", // Use "PATCH" if you're only updating some fields
           body: data,
         }),
-        invalidatesTags: (result, error, { id }) => [{ type: "Product", id }],
-      }),
-      getProductById: builder.query<ProductModel, number>({
-        query: (id) => `products/${id}/`, // ✅ Fetch single product
-        providesTags: (result, error, id) => [{ type: "Product", id }],
-      }),
-      deleteProduct: builder.mutation<void, number>({
-        query: (id) => ({
-          url: `products/${id}/`,
-          method: "DELETE",
-        }),
-        invalidatesTags: [{ type: "Product", id: "LIST" }],
+        // invalidatesTags: [{ type: "Product", id: "LIST" }], // Ensures the product list updates after editing
       }),
     };
   },
 });
 export const {
-  useGetProductQuery,
-  useGetProductByIdQuery,
-  useAddProductMutation,
-  useUpdateProductMutation,
-  useDeleteProductMutation,
-} = productApiSlice;
+  // useGetProductQuery,
+  // useAddProductMutation,
+  // useUpdateProductMutation,
+} = userApiSlice;

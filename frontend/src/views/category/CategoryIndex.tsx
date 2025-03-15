@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
   Box,
   Paper,
@@ -12,19 +12,34 @@ import {
   Skeleton,
   Typography,
   useTheme,
+  Pagination,
 } from "@mui/material";
 import { useNavigate } from "react-router";
 import EditIcon from "@mui/icons-material/Edit";
-import useGetCategory from "../../hooks/useGetCategory";
 import { Delete } from "@mui/icons-material";
 import { useDeleteDialog } from "../../context/DeleteDialogContext";
+import {
+  useDeleteCategoryMutation,
+  useGetCategoryQuery,
+} from "../../apislice/categoryApiSlice";
 
 export default function CategoryIndex() {
-  const { category, categoryLoading, refresh } = useGetCategory();
+  const [page, setPage] = useState(1);
+  const [deleteCategory, { isLoading }] = useDeleteCategoryMutation();
+  const {
+    data: category,
+    isLoading: categoryLoading,
+    refetch,
+  } = useGetCategoryQuery({
+    page: page,
+    limit: 10,
+  });
   const { openDialog } = useDeleteDialog();
   const theme = useTheme();
   const navigate = useNavigate();
-
+  if (categoryLoading) {
+    return <>loading....</>;
+  }
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
@@ -64,8 +79,8 @@ export default function CategoryIndex() {
                   </TableCell>
                 </TableRow>
               ))
-            ) : category.length > 0 ? (
-              category.map((row) => (
+            ) : category ? (
+              category?.results.map((row) => (
                 <TableRow
                   key={row.id}
                   sx={{
@@ -89,7 +104,9 @@ export default function CategoryIndex() {
                       size="small"
                       color="primary"
                       onClick={() =>
-                        openDialog(`/category/${row.id}/`, row.name, refresh)
+                        openDialog(`/category/${row.id}/`, () =>
+                          deleteCategory(row.id).unwrap()
+                        )
                       }
                       sx={{
                         "&:hover": { color: theme.palette.primary.dark },
@@ -112,6 +129,13 @@ export default function CategoryIndex() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Pagination
+        count={Math.ceil((category?.count || 10) / 10)}
+        onChange={(e: ChangeEvent<unknown>, value: number) => {
+          setPage(value);
+          refetch();
+        }}
+      />
     </Box>
   );
 }

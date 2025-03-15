@@ -26,4 +26,6 @@ export type OrderModel = {
   payments: PaymentModel[];
   balance: number;
   cost: number;
+  created_at: Date;
+  sub_total: number;
 };

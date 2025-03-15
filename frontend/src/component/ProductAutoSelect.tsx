@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, ChangeEvent } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
-import useGetProducts from "../hooks/useGetProducts";
 import { ProductModel } from "../models/ProductModel";
+import { useGetProductQuery } from "../apislice/productApiSlice";
+import { debounce } from "lodash";
 
 const ProductAutoSelect = ({
   value,
@@ -12,22 +13,31 @@ const ProductAutoSelect = ({
   onSelect: (product: ProductModel) => void;
   onReset: () => void;
 }) => {
-  const { products, isLoading, updateSearchParams } = useGetProducts();
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+  const { data: products, isLoading } = useGetProductQuery({
+    page: 1,
+    limit: 10,
+    search: debouncedSearch,
+  });
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      updateSearchParams(search);
-    }, 500); // Debounce API calls
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [search]);
+  const handleSearchDebounce = useCallback(
+    debounce((query: string) => {
+      setDebouncedSearch(query);
+    }, 500), // 500ms delay
+    []
+  );
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    handleSearchDebounce(e.target.value);
+  };
+  console.log(value);
 
   return (
     <Autocomplete
       size="small"
       fullWidth
-      options={products.results}
+      options={products?.results || []}
       getOptionLabel={(option) => option.name}
       loading={isLoading}
       value={value} // Controlled value
@@ -38,7 +48,7 @@ const ProductAutoSelect = ({
           label="Search Product"
           variant="outlined"
           fullWidth
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={handleSearchChange}
           InputProps={{
             ...params.InputProps,
             endAdornment: (
