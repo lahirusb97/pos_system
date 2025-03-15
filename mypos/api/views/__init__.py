@@ -7,6 +7,7 @@ from .order_view import OrderViewSet, OrderItemViewSet, PaymentViewSet
 from .create_order_view import CreateOrderAPIView
 from .order_list_view import OrderListAPIView
 from .OrderRetrieveAPIView import OrderRetrieveAPIView
-from .payment_view import PaymentListCreateAPIView
-from .repair_view import RepairViewSet
-from .repairCreateAPIView import RepairCreateAPIView
+from .payment_view import PaymentListCreateAPIView, RepairPaymentView
+from .repair_view import RepairViewSet, RepairRetrieveUpdateDeleteAPIView
+from .repairCreateAPIView import RepairCreateAPIView, RepairListAPIView
+from .customer_sale_view import CustomerSalesViewSet

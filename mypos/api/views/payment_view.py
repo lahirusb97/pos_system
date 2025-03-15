@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from ..models import Payment, Order, Repair  # Import Repair model
-from ..serializers import PaymentSerializer
+from ..serializers import PaymentSerializer,RepairPaymentSerializer
 
 class PaymentListCreateAPIView(generics.ListCreateAPIView):
     """
@@ -44,3 +44,13 @@ class PaymentListCreateAPIView(generics.ListCreateAPIView):
 
         # Save the payment record
         serializer.save()
+
+
+
+
+class RepairPaymentView(generics.CreateAPIView):
+    serializer_class = RepairPaymentSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
+        return Response({"message": "Payment recorded successfully!", "data": response.data}, status=status.HTTP_201_CREATED)

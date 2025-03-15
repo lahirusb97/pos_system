@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from ..models import Repair, Payment, Customer
-
+from .customer_serializer import CustomerSerializer
+from .payment_serializer import PaymentSerializer
 class RepairSerializer(serializers.ModelSerializer):
     payment_amount = serializers.IntegerField(write_only=True, required=False)  # ✅ Optional payment field
     customer_name = serializers.CharField(write_only=True)  # ✅ Prevents inclusion in response
@@ -42,3 +43,48 @@ class RepairSerializer(serializers.ModelSerializer):
             Payment.objects.create(repair=repair, amount=payment_amount)
 
         return repair
+    
+
+class RepairListSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer()  # ✅ Accept customer input
+    payments = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Repair
+        fields = [
+            "id", "customer", "repair_issue", "status", "note",
+            "cost", "total_price", "balance", "payments", "created_at"
+        ]
+    def get_payments(self, obj):
+        payments = obj.repair.all()  # Assuming a related_name="payments" in the Repair model
+        return PaymentSerializer(payments, many=True).data  # Use a serializer to format the output
+
+   
+class RepairUpdateSerializer(serializers.ModelSerializer):
+    customer = CustomerSerializer(read_only=True)  # ✅ Accept customer input
+    payments = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Repair
+        fields = [
+            "id",  "repair_issue", "status", "note",
+            "cost", "total_price", "balance", "payments","customer", "created_at"	
+        ]
+
+    def get_payments(self, obj):
+        payments = Payment.objects.filter(repair=obj)  # ✅ Fetch related payments
+        return PaymentSerializer(payments, many=True).data  # ✅ Serialize payments
+
+    def update(self, instance, validated_data):
+         # ✅ Recalculate total price and balance based on previous payments
+        total_price = validated_data.get("total_price", instance.total_price)
+        payments = Payment.objects.filter(repair=instance)
+        total_paid = sum(payment.amount for payment in payments)
+
+        instance.total_price = total_price
+        instance.balance = total_price - total_paid  # ✅ Adjust balance
+
+        # ✅ Apply other updates from validated_data (excluding customer)
+        validated_data.pop("customer", None)  # 🔥 Ignore customer updates
+
+        return super().update(instance, validated_data)  # ✅ Return updated instance

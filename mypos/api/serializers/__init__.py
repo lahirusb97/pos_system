@@ -4,6 +4,7 @@ from .product_serializer import ProductSerializer
 from .user_serializer import UserSerializer
 from .order_serializer import OrderSerializer
 from .orderItem_serializer import OrderItemSerializer
-from .payment_serializer import PaymentSerializer
+from .payment_serializer import PaymentSerializer, RepairPaymentSerializer
 from .order_create_serializer import OrderCreateSerializer
-from .RepairSerializer import RepairSerializer
+from .RepairSerializer import RepairSerializer, RepairListSerializer, RepairUpdateSerializer
+from .customer_sale_serializer import CustomerSaleSerializer

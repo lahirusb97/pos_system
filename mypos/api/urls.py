@@ -38,6 +38,10 @@ urlpatterns = [
    path("orders/<int:id>/", views.OrderRetrieveAPIView.as_view(), name="order-detail"),  # New path for single order
    path("payments/", views.PaymentListCreateAPIView.as_view(), name="payment-list"),
    path("repairs/", views.RepairCreateAPIView.as_view(), name="repair-create"),
+   path("repair/<int:id>/", views.RepairRetrieveUpdateDeleteAPIView.as_view(), name="repair-create"),
+   path("repairs_list/", views.RepairListAPIView.as_view(), name="repair-get"),
+   path("customers/", views.CustomerSalesViewSet.as_view(), name="repair-get"),
+   path("repairs/payment/", views.RepairPaymentView.as_view(), name="repair-payment"),
 ]
 
 
