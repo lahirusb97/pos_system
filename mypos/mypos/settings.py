@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -115,10 +117,10 @@ WSGI_APPLICATION = 'mypos.wsgi.application'
 DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mypos',  # Your MySQL database name
-        'USER': 'root',  # Your MySQL username
-        'PASSWORD': '',  # Replace with your actual password
-        'HOST': 'localhost',  # Or '127.0.0.1'
+         'NAME': config('DB_NAME'),  # Loads from .env file
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
         'PORT': '3306',  # Default MySQL port
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
