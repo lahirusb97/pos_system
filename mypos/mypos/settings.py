@@ -31,12 +31,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(','
 
 
 CORS_ALLOW_CREDENTIALS = True 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  
-    "http://127.0.0.1:8000",
-    "http://localhost:5174",  # Add this if needed
-]
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
