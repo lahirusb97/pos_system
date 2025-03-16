@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   TextField,
   Button,
@@ -33,7 +33,7 @@ const repairSchema = z.object({
 
 // Form Type
 
-type RepairFormValues = z.infer<typeof repairSchema>;
+export type RepairFormValues = z.infer<typeof repairSchema>;
 
 export default function RepairEdit() {
   const { id } = useParams<{ id: string }>();
@@ -72,8 +72,7 @@ export default function RepairEdit() {
   // Handle Form Submission
   const onSubmit = async (data: RepairFormValues) => {
     try {
-      await updateRepair({ id: Number(id), ...data }).unwrap();
-
+      await updateRepair({ id: Number(id), data: { ...data } }).unwrap();
       navigate(-1); // Redirect after update
     } catch (error) {
       console.error("Update failed", error);

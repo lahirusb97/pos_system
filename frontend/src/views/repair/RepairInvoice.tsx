@@ -158,7 +158,7 @@ const RepairInvoice = () => {
           >
             <Box sx={{ textAlign: "left" }}>{repair?.repair_issue}</Box>
             <Box sx={{ textAlign: "right" }}>
-              {numberWithCommas(repair?.total_price)}
+              {numberWithCommas(repair?.total_price || 0)}
             </Box>
           </Box>
           <Box
@@ -173,7 +173,9 @@ const RepairInvoice = () => {
           >
             <Box sx={{ textAlign: "left" }}>Total Payment</Box>
             <Box sx={{ textAlign: "right" }}>
-              {numberWithCommas(repair?.total_price - repair?.balance)}
+              {numberWithCommas(
+                (repair?.total_price || 0) - (repair?.balance || 0)
+              )}
             </Box>
           </Box>
           <Box
@@ -188,7 +190,7 @@ const RepairInvoice = () => {
           >
             <Box sx={{ textAlign: "left" }}>Balance</Box>
             <Box sx={{ textAlign: "right" }}>
-              {numberWithCommas(repair?.balance)}
+              {numberWithCommas(repair?.balance || 0)}
             </Box>
           </Box>
         </Box>

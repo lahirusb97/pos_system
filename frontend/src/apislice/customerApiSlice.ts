@@ -43,7 +43,9 @@ export const customerApiSlice = createApi({
           method: "PUT", // Use "PATCH" if you're only updating some fields
           body: data,
         }),
-        invalidatesTags: (result, error, { id }) => [{ type: "Customer", id }],
+        invalidatesTags: (_result, _error, { id }) => [
+          { type: "Customer", id },
+        ],
       }),
     };
   },

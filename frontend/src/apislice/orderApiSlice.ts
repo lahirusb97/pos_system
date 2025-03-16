@@ -46,7 +46,7 @@ export const orderApiSlice = createApi({
       // }),
       getSingleOrder: builder.query<OrderModel, number>({
         query: (id) => `orders/${id}/`, // `id` is used to fetch the single order by ID
-        providesTags: (result, error, id) => [{ type: "Order", id: id }],
+        providesTags: (_result, _error, id) => [{ type: "Order", id: id }],
       }),
       deleteOrder: builder.mutation<void, number>({
         query: (id) => ({
@@ -61,7 +61,7 @@ export const orderApiSlice = createApi({
           method: "POST", // Use "PATCH" if you're only updating some fields
           body: payment,
         }),
-        invalidatesTags: (result, error, payment) => [
+        invalidatesTags: (_result, _error, payment) => [
           { type: "Order", id: payment.order },
         ],
       }),

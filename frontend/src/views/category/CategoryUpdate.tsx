@@ -24,9 +24,7 @@ const CategoryUpdate = () => {
   const { id } = useParams();
 
   const { data: singleCategory, isLoading: singleCategoryLoading } =
-    useGetCategoryByIdQuery(id, {
-      skip: isNaN(id), // ✅ Skip query if ID is not valid
-    });
+    useGetCategoryByIdQuery(id || "");
   const [updateCategory] = useUpdateCategoryMutation();
   const {
     handleSubmit,
@@ -45,10 +43,11 @@ const CategoryUpdate = () => {
         name: singleCategory?.name || "",
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [singleCategory]);
   const onSubmit = async (data: CategoryFormData) => {
     try {
-      await updateCategory({ id, data }).unwrap();
+      await updateCategory({ id: Number(id), data: data }).unwrap();
       reset(); // Reset form after successful submission
       navigate(-1);
     } catch (error) {

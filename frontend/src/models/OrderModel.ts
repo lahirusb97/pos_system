@@ -13,7 +13,7 @@ export type OrderItemModel = {
   product: number;
   product_name: number;
   quantity: number;
-  price: string; // Date string from backend
+  price: number; // Date string from backend
 };
 
 export type OrderModel = {

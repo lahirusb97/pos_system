@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from "react";
+import { useState, useCallback, ChangeEvent } from "react";
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 import { ProductModel } from "../models/ProductModel";
 import { useGetProductQuery } from "../apislice/productApiSlice";
@@ -13,7 +13,7 @@ const ProductAutoSelect = ({
   onSelect: (product: ProductModel) => void;
   onReset: () => void;
 }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const { data: products, isLoading } = useGetProductQuery({
     page: 1,
@@ -21,6 +21,7 @@ const ProductAutoSelect = ({
     search: debouncedSearch,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchDebounce = useCallback(
     debounce((query: string) => {
       setDebouncedSearch(query);
@@ -31,7 +32,6 @@ const ProductAutoSelect = ({
     setSearchQuery(e.target.value);
     handleSearchDebounce(e.target.value);
   };
-  console.log(value);
 
   return (
     <Autocomplete

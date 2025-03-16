@@ -1,5 +1,6 @@
 import { CustomerModel } from "./CustomerModel";
 import { PaymentModel } from "./OrderModel";
+type RepairStatus = "pending" | "completed" | "canceled";
 
 interface Repair {
   customer: 1;
@@ -14,7 +15,7 @@ interface RepairResponse {
   id: number;
   customer: CustomerModel;
   repair_issue: string;
-  status: string;
+  status: RepairStatus;
   note: string;
   cost: number;
   total_price: number;

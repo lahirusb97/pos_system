@@ -85,7 +85,7 @@ const Invoice = () => {
           Tel: 071- 9990599 / 075 2296970
         </Typography>
         <Typography variant="body2" align="center">
-          {dateAndTimeFormat(invoiceDetail?.created_at)}{" "}
+          {dateAndTimeFormat(invoiceDetail?.created_at?.toDateString())}{" "}
           {/* Use DateView utility function */}
         </Typography>
 
@@ -180,7 +180,7 @@ const Invoice = () => {
                 {numberWithCommas(item.price)}
               </Box>
               <Box sx={{ textAlign: "right" }}>
-                {numberWithCommas(item.quantity * parseInt(item.price))}
+                {numberWithCommas(item.quantity * item.price)}
               </Box>
             </Box>
           ))}
@@ -212,7 +212,7 @@ const Invoice = () => {
                 borderBottom: "1px solid #000",
               }}
             >
-              {numberWithCommas(invoiceDetail?.sub_total)}
+              {numberWithCommas(invoiceDetail?.sub_total ?? 0)}
             </Box>
           </Box>
 
@@ -243,7 +243,7 @@ const Invoice = () => {
                 borderBottom: "1px solid #000",
               }}
             >
-              {numberWithCommas(invoiceDetail?.discount)}
+              {numberWithCommas(invoiceDetail?.discount ?? 0)}
             </Box>
           </Box>
 
@@ -276,7 +276,7 @@ const Invoice = () => {
                 borderBottom: "1px solid #000",
               }}
             >
-              <strong>{numberWithCommas(invoiceDetail?.total)}</strong>
+              <strong>{numberWithCommas(invoiceDetail?.total ?? 0)}</strong>
             </Box>
           </Box>
 
@@ -307,7 +307,9 @@ const Invoice = () => {
                 borderBottom: "1px solid #000",
               }}
             >
-              {numberWithCommas(invoiceDetail?.total - invoiceDetail?.balance)}
+              {numberWithCommas(
+                (invoiceDetail?.total ?? 0) - (invoiceDetail?.balance ?? 0)
+              )}
             </Box>
           </Box>
 
@@ -337,7 +339,7 @@ const Invoice = () => {
                 padding: "1mm",
               }}
             >
-              {numberWithCommas(invoiceDetail?.balance)}
+              {numberWithCommas(invoiceDetail?.balance ?? 0)}
             </Box>
           </Box>
         </Box>

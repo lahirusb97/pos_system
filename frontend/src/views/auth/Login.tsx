@@ -8,15 +8,14 @@ import {
   Box,
   Paper,
 } from "@mui/material";
-import { useAuthContext } from "../../context/AuthContext";
 import { useLoginUserMutation } from "../../apislice/authApiSlice";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
+import { saveToLocalStorage } from "../../util/authDataConver";
 
 const Login = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
-  const { setAuth } = useAuthContext();
   const [loginUser, { isLoading }] = useLoginUserMutation();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -24,12 +23,10 @@ const Login = () => {
 
     try {
       const response = await loginUser({ username, password }).unwrap();
-
-      setAuth(response);
+      saveToLocalStorage(response);
       navigate("/");
     } catch (error) {
       extractErrorMessage(error);
-      console.log(error);
     }
   };
 

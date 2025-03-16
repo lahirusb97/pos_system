@@ -7,11 +7,9 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
-import axiosClient from "../../axiosClient"; // Import your Axios instance
 
 import DropdownInput from "../../component/DropdownInput";
 import toast from "react-hot-toast";
-import { AxiosError } from "axios";
 import schemaProduct, { ProductFormZod } from "../../schema/schemaProduct";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
 import { useAddProductMutation } from "../../apislice/productApiSlice";
@@ -19,13 +17,12 @@ import { useGetCategoryQuery } from "../../apislice/categoryApiSlice";
 
 const ProductCreate = () => {
   // const { category, categoryLoading } = useGetCategory();
-  const {
-    data: category,
-    error,
-    isLoading: categoryLoading,
-  } = useGetCategoryQuery({ page: 1, limit: 1, search: "" });
-  const [addProduct, { isLoading, isError, isSuccess }] =
-    useAddProductMutation();
+  const { data: category, isLoading: categoryLoading } = useGetCategoryQuery({
+    page: 1,
+    limit: 1,
+    search: "",
+  });
+  const [addProduct, { isLoading }] = useAddProductMutation();
 
   const {
     handleSubmit,
@@ -144,8 +141,14 @@ const ProductCreate = () => {
         error={!!errors.note}
         helperText={errors.note?.message || ""}
       />
-      <Button type="submit" variant="contained" color="primary" fullWidth>
-        Add Product
+      <Button
+        disabled={isLoading}
+        type="submit"
+        variant="contained"
+        color="primary"
+        fullWidth
+      >
+        {isLoading ? "Adding..." : "Add Product"}
       </Button>
     </Paper>
   );

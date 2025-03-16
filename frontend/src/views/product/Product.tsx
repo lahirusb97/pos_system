@@ -1,5 +1,5 @@
 // UI Component: ProductDetails.tsx
-import React, { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import {
   Box,
   Paper,
@@ -24,9 +24,10 @@ import {
   useGetProductQuery,
 } from "../../apislice/productApiSlice";
 import { debounce } from "lodash";
-import { useAuthContext } from "../../context/AuthContext";
+import { getFromLocalStorage } from "../../util/authDataConver";
+
 export default function ProductDetails() {
-  const { user } = useAuthContext();
+  const user = getFromLocalStorage();
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function ProductDetails() {
   const handleEdit = (id: number) => {
     navigate(`/product/update/${id}`);
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchDebounce = useCallback(
     debounce((query: string) => {
       setDebouncedSearch(query);
@@ -90,7 +92,7 @@ export default function ProductDetails() {
               <TableCell sx={{ fontWeight: "bold" }}>Normal Price</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Max Price</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Stock Qty</TableCell>
-              {user.is_superuser && (
+              {user?.is_superuser && (
                 <TableCell sx={{ fontWeight: "bold" }}>Cost</TableCell>
               )}
             </TableRow>
@@ -117,6 +119,7 @@ export default function ProductDetails() {
                       <Edit fontSize="small" />
                     </IconButton>
                     <IconButton
+                      disabled={isDeleting}
                       color="error"
                       onClick={() =>
                         openDialog(`/products/${row.id}/`, () =>
@@ -132,7 +135,7 @@ export default function ProductDetails() {
                   <TableCell>{row.normal_price}</TableCell>
                   <TableCell>{row.max_price}</TableCell>
                   <TableCell>{row.qty}</TableCell>
-                  {user.is_superuser && <TableCell>{row.cost}</TableCell>}
+                  {user?.is_superuser && <TableCell>{row.cost}</TableCell>}
                 </TableRow>
               ))
             ) : (
@@ -157,6 +160,7 @@ export default function ProductDetails() {
         <Pagination
           count={Math.ceil((products?.count || 10) / 10)}
           onChange={(e: ChangeEvent<unknown>, value: number) => {
+            e.preventDefault();
             setPage(value);
             refetch();
           }}

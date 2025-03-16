@@ -1,6 +1,4 @@
 import toast from "react-hot-toast";
-import { APIError } from "../models/APIErrors";
-
 export const extractErrorMessage = (error: unknown) => {
   console.log("Raw Error:", error); // Debugging
 
@@ -13,9 +11,10 @@ export const extractErrorMessage = (error: unknown) => {
     error.data &&
     typeof error.data === "object"
   ) {
+    const data = error.data as { [key: string]: unknown };
     const firstKey = Object.keys(error.data)[0]; // Get the first key dynamically
     if (firstKey) {
-      const value = error.data[firstKey];
+      const value = data[firstKey];
 
       if (Array.isArray(value)) {
         // ✅ If it's an array, join all messages into one string

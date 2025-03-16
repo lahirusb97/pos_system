@@ -1,7 +1,6 @@
-import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
 import {
   TextField,
   Button,
@@ -11,17 +10,14 @@ import {
   Box,
 } from "@mui/material";
 import repairSchema, { RepairFormZod } from "../../schema/schemarepair";
-import {
-  useAddRepairMutation,
-  useDeleteRepairMutation,
-} from "../../apislice/repairApiSlice";
+import { useAddRepairMutation } from "../../apislice/repairApiSlice";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
 import toast from "react-hot-toast";
 
 // ✅ Zod Schema for validation
 
 export default function RepairCreate() {
-  const [addRepair, { isLoading, error }] = useAddRepairMutation();
+  const [addRepair, { isLoading }] = useAddRepairMutation();
   const {
     register,
     handleSubmit,
@@ -117,8 +113,14 @@ export default function RepairCreate() {
           <input type="hidden" {...register("status")} />
 
           <Box sx={{ mt: 2 }}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Submit Repair
+            <Button
+              disabled={isLoading}
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+            >
+              {isLoading ? "Creating..." : "Create Repair Order"}
             </Button>
           </Box>
         </form>

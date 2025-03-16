@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Container,
   TextField,
@@ -127,7 +127,7 @@ const Invoice = () => {
           onChange={(e) => setPrice(parseInt(e.target.value))}
           onFocus={(e) => {
             if (e.target.value === "0") {
-              setPrice("");
+              setPrice(0);
             }
           }}
           onBlur={(e) => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   useGetSingleOrderQuery,
@@ -15,7 +15,6 @@ import {
   TableHead,
   TableRow,
   CircularProgress,
-  Alert,
   TextField,
   Button,
   Box,
@@ -87,7 +86,7 @@ export default function PaymentForm() {
         </Typography>
         <Typography>
           <strong>Invoice Date:</strong>{" "}
-          {dateAndTimeFormat(invoice?.created_at)}
+          {dateAndTimeFormat(invoice?.created_at.toString())}
         </Typography>
       </Paper>
 
@@ -139,7 +138,7 @@ export default function PaymentForm() {
       <Typography variant="subtitle2" sx={{ mt: 1 }}>
         Payments
       </Typography>
-      {invoice?.payments?.length > 0 ? (
+      {invoice && (
         <TableContainer component={Paper} sx={{ mt: 1 }}>
           <Table size="small">
             <TableHead>
@@ -164,8 +163,6 @@ export default function PaymentForm() {
             </TableBody>
           </Table>
         </TableContainer>
-      ) : (
-        <Typography sx={{ mt: 2 }}>No payments made yet.</Typography>
       )}
 
       {/* Final Balance */}

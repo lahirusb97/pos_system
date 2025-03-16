@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "../baseAuthRtk";
 import { CategoryModel } from "../models/CategoryModel";
 import { PaginatedResponse } from "../models/PaginatedResponse";
+import { CategoryFormZod } from "../schema/schemaCategory";
 
 export const categoryApiSlice = createApi({
   reducerPath: "category",
@@ -23,7 +24,7 @@ export const categoryApiSlice = createApi({
         providesTags: [{ type: "Category", id: "LIST" }],
       }),
 
-      addCategory: builder.mutation<CategoryModel, CategoryModel>({
+      addCategory: builder.mutation<CategoryModel, CategoryFormZod>({
         query: (newCategory) => ({
           url: "category/",
           method: "POST",
@@ -34,7 +35,7 @@ export const categoryApiSlice = createApi({
       }),
       updateCategory: builder.mutation<
         CategoryModel,
-        { id: number; data: CategoryModel }
+        { id: number; data: CategoryFormZod }
       >({
         query: ({ id, data }) => ({
           url: `category/${id}/`, // Assuming your API expects the category ID in the URL
@@ -43,11 +44,11 @@ export const categoryApiSlice = createApi({
         }),
         invalidatesTags: [{ type: "Category", id: "LIST" }],
       }),
-      getCategoryById: builder.query<CategoryModel, number>({
+      getCategoryById: builder.query<CategoryModel, string>({
         query: (id) => `category/${id}/`, // ✅ Fetch single category
-        providesTags: (result, error, id) => [{ type: "Category", id }],
+        providesTags: (_result, _error, id) => [{ type: "Category", id }],
       }),
-      deleteCategory: builder.mutation<void, number>({
+      deleteCategory: builder.mutation<void, string>({
         query: (id) => ({
           url: `category/${id}/`,
           method: "DELETE",

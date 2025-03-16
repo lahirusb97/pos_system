@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Button,
   CircularProgress,
@@ -29,7 +29,7 @@ export default function RepairPayment() {
   } = useGetRepairQuery(Number(id));
   const [addRepairPayment, { isLoading: isPaying }] =
     useAddRepairPaymentMutation();
-  const [paymentAmount, setPaymentAmount] = useState<number>("");
+  const [paymentAmount, setPaymentAmount] = useState<number>(0);
 
   if (isLoading) return <CircularProgress />;
   if (error) return <p>Error loading repair details.</p>;
@@ -40,7 +40,7 @@ export default function RepairPayment() {
         repair: Number(id),
         amount: paymentAmount,
       }).unwrap();
-      setPaymentAmount(""); // Reset field after successful payment
+      setPaymentAmount(0); // Reset field after successful payment
       refetch();
       toast.success("Payment processed successfully.");
     } catch (error) {
@@ -102,7 +102,9 @@ export default function RepairPayment() {
           fullWidth
           sx={{ mt: 1 }}
           disabled={
-            isPaying || paymentAmount <= 0 || paymentAmount > repair.balance
+            isPaying ||
+            paymentAmount <= 0 ||
+            paymentAmount > (repair?.balance || 0)
           }
           onClick={handlePayment}
         >

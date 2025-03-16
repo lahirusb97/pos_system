@@ -4,6 +4,8 @@ import { baseQuery } from "../baseAuthRtk";
 import { PaginatedResponse } from "../models/PaginatedResponse";
 import { Repair, RepairResponse } from "../models/Repair";
 import { RepairFormZod } from "../schema/schemarepair";
+import { RepairPaymentModel } from "../models/RepairPaymentModel";
+import { RepairFormValues } from "../views/repair/RepairEdit";
 
 export const repairApiSlice = createApi({
   reducerPath: "Repair",
@@ -25,7 +27,7 @@ export const repairApiSlice = createApi({
         providesTags: [{ type: "Repairs", id: "LIST" }],
       }),
 
-      addRepairPayment: builder.mutation<Repair, RepairFormZod>({
+      addRepairPayment: builder.mutation<Repair, RepairPaymentModel>({
         query: (newPayment) => ({
           url: "repairs/payment/",
           method: "POST",
@@ -43,7 +45,7 @@ export const repairApiSlice = createApi({
       }),
       updateRepair: builder.mutation<
         Repair,
-        { id: number; data: RepairFormZod }
+        { id: number; data: RepairFormValues }
       >({
         query: ({ id, data }) => ({
           url: `repair/${id}/`, // Assuming your API expects the product ID in the URL
@@ -60,7 +62,7 @@ export const repairApiSlice = createApi({
       }),
       getRepair: builder.query<RepairResponse, number>({
         query: (id) => `repair/${id}/`,
-        providesTags: (result, error, id) => [{ type: "Repairs", id }],
+        providesTags: (_result, _error, id) => [{ type: "Repairs", id }],
       }),
     };
   },

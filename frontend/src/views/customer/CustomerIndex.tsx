@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useCallback } from "react";
+import { useState, ChangeEvent, useCallback } from "react";
 import {
   Box,
   Paper,
@@ -8,16 +8,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
   Skeleton,
   Typography,
   useTheme,
   Pagination,
   TextField,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import { Delete } from "@mui/icons-material";
-import { useNavigate } from "react-router";
 import { useGetCustomersQuery } from "../../apislice/customerApiSlice";
 import { numberWithCommas } from "../../util/numberWithCommas";
 import { debounce } from "lodash";
@@ -28,13 +24,12 @@ export default function CustomerIndex() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const limit = 10;
   const theme = useTheme();
-  const navigate = useNavigate();
-
   const {
     data: customers,
     isLoading,
     refetch,
   } = useGetCustomersQuery({ page, limit, search: debouncedSearch });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchDebounce = useCallback(
     debounce((query: string) => {
       setDebouncedSearch(query);
@@ -122,7 +117,7 @@ export default function CustomerIndex() {
 
       <Pagination
         count={Math.ceil((customers?.count || 10) / limit)}
-        onChange={(e: ChangeEvent<unknown>, value: number) => {
+        onChange={(_e: ChangeEvent<unknown>, value: number) => {
           setPage(value);
           refetch();
         }}

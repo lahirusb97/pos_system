@@ -1,5 +1,5 @@
 import { Button, IconButton, TextField } from "@mui/material";
-import React, { useCallback, ChangeEvent, useState, useEffect } from "react";
+import { useCallback, ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Table,
@@ -16,17 +16,7 @@ import {
   useGetRepairsQuery,
 } from "../../apislice/repairApiSlice";
 import { debounce } from "lodash";
-import {
-  Add,
-  AddBoxSharp,
-  Collections,
-  Delete,
-  Edit,
-  Money,
-  MoneyOffSharp,
-  PaymentOutlined,
-  Print,
-} from "@mui/icons-material";
+import { AddBoxSharp, Delete, Edit, Print } from "@mui/icons-material";
 import { useDeleteDialog } from "../../context/DeleteDialogContext";
 
 export default function RepairIndex() {
@@ -35,19 +25,15 @@ export default function RepairIndex() {
   const [searchQuery, setSearchQuery] = useState("");
   const { openDialog } = useDeleteDialog();
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [deleteRepair, { isLoading: deleteLoading, error: deleteError }] =
+  const [deleteRepair, { isLoading: deleteLoading }] =
     useDeleteRepairMutation(); // ✅ Use the mutation
 
-  const {
-    data: repairList,
-    error,
-    isLoading,
-    refetch,
-  } = useGetRepairsQuery({
+  const { data: repairList, refetch } = useGetRepairsQuery({
     page,
     limit: 10,
     search: debouncedSearch,
   });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchDebounce = useCallback(
     debounce((query: string) => {
       setDebouncedSearch(query);
@@ -134,6 +120,7 @@ export default function RepairIndex() {
                 <TableCell>
                   {repair.status}
                   <IconButton
+                    disabled={deleteLoading}
                     color="error"
                     onClick={() =>
                       openDialog(`/repairs/${repair.id}/`, () =>
@@ -152,6 +139,7 @@ export default function RepairIndex() {
       <Pagination
         count={Math.ceil((repairList?.count || 10) / 10)}
         onChange={(e: ChangeEvent<unknown>, value: number) => {
+          e.preventDefault();
           setPage(value);
           refetch();
         }}

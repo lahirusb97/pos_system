@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Box,
   Button,
@@ -14,49 +13,22 @@ import {
 import { useNavigate, useParams } from "react-router";
 import DropdownInput from "../../component/DropdownInput";
 import toast from "react-hot-toast";
-import { ProductForm } from "../../models/ProductForm";
 import {
   useGetProductByIdQuery,
   useUpdateProductMutation,
 } from "../../apislice/productApiSlice";
 import { useGetCategoryQuery } from "../../apislice/categoryApiSlice";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
+import schemaProduct, { ProductFormZod } from "../../schema/schemaProduct";
 
-// Validation Schema
-const productSchema = yup.object().shape({
-  name: yup.string().required("Name is required"),
-  normal_price: yup
-    .number()
-    .typeError("Price must be a number")
-    .positive("Price must be positive")
-    .required("Normal price is required"),
-  max_price: yup
-    .number()
-    .typeError("Price must be a number")
-    .positive("Price must be positive")
-    .required("Max price is required"),
-  qty: yup
-    .number()
-    .typeError("Quantity must be a number")
-    .integer("Quantity must be an integer")
-    .min(0, "Quantity cannot be negative")
-    .required("Quantity is required"),
-  cost: yup
-    .number()
-    .typeError("Cost must be a number")
-    .positive("Cost must be positive")
-    .required("Cost is required"),
-  note: yup.string().notRequired(),
-  category: yup.number().required("Category is required"),
-});
+// Validation Schem
 
 export default function ProductUpdate() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const { data: singleProduct, isLoading: singleProductLoading } =
-    useGetProductByIdQuery(id, {
-      skip: isNaN(id), // ✅ Skip query if ID is not a number
-    });
+    useGetProductByIdQuery(id || "");
 
   const [updateProduct, { isLoading: updateLoading }] =
     useUpdateProductMutation();
@@ -72,8 +44,8 @@ export default function ProductUpdate() {
     control,
     reset,
     formState: { errors },
-  } = useForm<ProductForm>({
-    resolver: yupResolver(productSchema),
+  } = useForm<ProductFormZod>({
+    resolver: zodResolver(schemaProduct),
   });
 
   useEffect(() => {
@@ -90,9 +62,9 @@ export default function ProductUpdate() {
     }
   }, [singleProduct]);
 
-  const onSubmit = async (data: ProductForm) => {
+  const onSubmit = async (data: ProductFormZod) => {
     try {
-      await updateProduct({ id, data }).unwrap();
+      await updateProduct({ id: Number(id), data }).unwrap();
       toast.success("Product updated successfully");
       reset();
       navigate(-1);
@@ -179,8 +151,13 @@ export default function ProductUpdate() {
               )}
             />
           </FormControl>
-          <Button fullWidth type="submit" variant="contained" disabled={false}>
-            {false ? <CircularProgress size={24} /> : "Update"}
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            disabled={updateLoading}
+          >
+            {updateLoading ? <CircularProgress size={24} /> : "Update"}
           </Button>
         </form>
       </Paper>

@@ -40,7 +40,7 @@ const AutocompleteInputField: React.FC<AutocompleteInputFieldProps> = ({
   }, [defaultId, options]);
 
   const handleChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _event: React.SyntheticEvent<Element, Event>,
     newValue: Option | null
   ) => {
     setSelectedOption(newValue);

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useCallback } from "react";
+import { useState, ChangeEvent, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -20,7 +20,6 @@ import {
 import { debounce } from "lodash";
 import { Delete, Fullscreen } from "@mui/icons-material";
 import { useNavigate } from "react-router";
-import { dateAndTimeFormat } from "../../util/dateAndTimeFormat";
 import toast from "react-hot-toast";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
 
@@ -37,6 +36,7 @@ export default function InvoiceTable() {
   });
   const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSearchDebounce = useCallback(
     debounce((query: string) => {
       setDebouncedSearch(query);
@@ -96,6 +96,7 @@ export default function InvoiceTable() {
             <TableRow key={invoice.id}>
               <TableCell>
                 <IconButton
+                  disabled={isDeleting}
                   onClick={() => {
                     handleOrderDelete(invoice.id);
                   }}
@@ -129,7 +130,7 @@ export default function InvoiceTable() {
       >
         <Pagination
           count={Math.ceil((data?.count || 10) / 10)}
-          onChange={(e: ChangeEvent<unknown>, value: number) => {
+          onChange={(_e: ChangeEvent<unknown>, value: number) => {
             setPage(value);
             refetch();
           }}

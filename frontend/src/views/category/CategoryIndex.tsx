@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import {
   Box,
   Paper,
@@ -103,9 +103,10 @@ export default function CategoryIndex() {
                     <IconButton
                       size="small"
                       color="primary"
+                      disabled={isLoading}
                       onClick={() =>
                         openDialog(`/category/${row.id}/`, () =>
-                          deleteCategory(row.id).unwrap()
+                          deleteCategory(row.id.toString()).unwrap()
                         )
                       }
                       sx={{
@@ -131,7 +132,7 @@ export default function CategoryIndex() {
       </TableContainer>
       <Pagination
         count={Math.ceil((category?.count || 10) / 10)}
-        onChange={(e: ChangeEvent<unknown>, value: number) => {
+        onChange={(_e: ChangeEvent<unknown>, value: number) => {
           setPage(value);
           refetch();
         }}

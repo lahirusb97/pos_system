@@ -1,38 +1,28 @@
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
-import { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import CategoryIndex from "./CategoryIndex";
 import { useAddCategoryMutation } from "../../apislice/categoryApiSlice";
 import { extractErrorMessage } from "../../util/extractErrorMessage";
-
-interface CategoryFormData {
-  name: string;
-}
-
-const schema = yup.object().shape({
-  name: yup.string().required("Category name is required"),
-});
+import schemaCategory, { CategoryFormZod } from "../../schema/schemaCategory";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const CategoryForm = () => {
-  const [AddCategory, { isLoading, isError, isSuccess }] =
-    useAddCategoryMutation();
+  const [AddCategory, { isLoading }] = useAddCategoryMutation();
 
   const {
     handleSubmit,
     control,
     reset,
     formState: { errors },
-  } = useForm<CategoryFormData>({
-    resolver: yupResolver(schema),
+  } = useForm<CategoryFormZod>({
+    resolver: zodResolver(schemaCategory),
     defaultValues: {
       name: "",
     },
   });
 
-  const onSubmit = async (data: CategoryFormData) => {
+  const onSubmit = async (data: CategoryFormZod) => {
     try {
       await AddCategory(data).unwrap();
 
@@ -71,8 +61,14 @@ const CategoryForm = () => {
         )}
 
         {/* Submit Button */}
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Add Category
+        <Button
+          disabled={isLoading}
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+        >
+          {isLoading ? "Adding..." : "Add Category"}
         </Button>
       </Box>
       <CategoryIndex />

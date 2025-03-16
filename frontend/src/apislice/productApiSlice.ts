@@ -43,11 +43,11 @@ export const productApiSlice = createApi({
           method: "PUT", // Use "PATCH" if you're only updating some fields
           body: data,
         }),
-        invalidatesTags: (result, error, { id }) => [{ type: "Product", id }],
+        invalidatesTags: (_result, _error, { id }) => [{ type: "Product", id }],
       }),
-      getProductById: builder.query<ProductModel, number>({
+      getProductById: builder.query<ProductModel, string>({
         query: (id) => `products/${id}/`, // ✅ Fetch single product
-        providesTags: (result, error, id) => [{ type: "Product", id }],
+        providesTags: (_result, _error, id) => [{ type: "Product", id }],
       }),
       deleteProduct: builder.mutation<void, number>({
         query: (id) => ({
