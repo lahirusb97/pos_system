@@ -48,9 +48,5 @@ This system is particularly suited for businesses offering sales and repair serv
 - **Python** (version >= 3.8)
 - **SQL** database
 
-### Frontend Setup
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/my-pos-system.git
-   cd my-pos-system/frontend
+
